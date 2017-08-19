@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50624
 File Encoding         : 65001
 
-Date: 2017-08-18 08:36:16
+Date: 2017-08-20 00:23:53
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -693,14 +693,23 @@ CREATE TABLE `goods` (
   `name` varchar(100) NOT NULL DEFAULT '',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `open` tinyint(1) DEFAULT '1' COMMENT '0 关房 1开房',
+  `status` tinyint(1) DEFAULT '1' COMMENT '1未入住  0已入住  -1维护中',
   PRIMARY KEY (`goods_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of goods
 -- ----------------------------
-INSERT INTO `goods` VALUES ('4', '18973', '2017-05-06', '2017-08-17 11:34:17', '2017-08-17 22:15:39');
-INSERT INTO `goods` VALUES ('5', '18973', '2017-08-17', '2017-08-17 11:55:34', '2017-08-17 22:15:32');
+INSERT INTO `goods` VALUES ('4', '18973', '地字 002号', '2017-08-17 11:34:17', '2017-08-18 15:18:13', '1', '1');
+INSERT INTO `goods` VALUES ('5', '18973', '地字 001号', '2017-08-17 11:55:34', '2017-08-18 15:17:58', '1', '1');
+INSERT INTO `goods` VALUES ('6', '18961', '天字 001号 ', '2017-08-18 10:56:04', '2017-08-19 22:52:38', '0', '1');
+INSERT INTO `goods` VALUES ('7', '18961', '天字 002号', '2017-08-18 15:16:35', '2017-08-18 15:16:35', '1', '1');
+INSERT INTO `goods` VALUES ('8', '18961', '天字 003号', '2017-08-18 15:16:49', '2017-08-18 15:16:49', '1', '1');
+INSERT INTO `goods` VALUES ('9', '18973', '地字 003号', '2017-08-18 15:18:28', '2017-08-19 22:56:14', '1', '1');
+INSERT INTO `goods` VALUES ('10', '18972', '玄子 001号', '2017-08-18 15:23:45', '2017-08-18 15:23:45', '1', '1');
+INSERT INTO `goods` VALUES ('11', '18972', '玄子 002号', '2017-08-18 15:23:57', '2017-08-18 15:24:05', '1', '1');
+INSERT INTO `goods` VALUES ('12', '18972', '玄子 003号', '2017-08-18 15:24:20', '2017-08-18 15:24:20', '1', '1');
 
 -- ----------------------------
 -- Table structure for goods_attr
@@ -738,15 +747,17 @@ CREATE TABLE `goods_category` (
   `description` varchar(255) DEFAULT NULL,
   `number` int(10) DEFAULT NULL,
   `sort` varchar(10) DEFAULT NULL,
+  `start` varchar(255) DEFAULT NULL,
+  `end` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=18977 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of goods_category
 -- ----------------------------
-INSERT INTO `goods_category` VALUES ('18973', '标间', '1', '368.00', '258.00', '238.00', '1', 'http://www.hotel.io/images/1502979660.jpg', 'http://www.hotel.io/images/1502979660.jpg', '标间', '30', '97');
-INSERT INTO `goods_category` VALUES ('18972', '双床房', '1', '368.00', '258.00', '238.00', '2', 'http://www.hotel.io/images/1502979537.jpg', 'http://www.hotel.io/images/1502979537.jpg', '双床房', '20', '98');
-INSERT INTO `goods_category` VALUES ('18961', '豪华大床房', '1', '368.00', '258.00', '238.00', '1', 'http://www.hotel.io/images/1502979388.jpg', 'http://www.hotel.io/images/1502979388.jpg', '豪华', '20', '99');
+INSERT INTO `goods_category` VALUES ('18973', '标间', '1', '368.00', '258.00', '238.00', '1', 'http://www.hotel.io/images/1503104703.jpg', 'http://www.hotel.io/images/1503104703.jpg', '标间', '30', '97', '2017-08-18 14:49:30', '2017-08-26 14:49:32');
+INSERT INTO `goods_category` VALUES ('18972', '双床房', '1', '568.00', '498.00', '468.00', '2', 'http://www.hotel.io/images/1503104686.jpg', 'http://www.hotel.io/images/1503104686.jpg', '标间', '20', '98', '2017-08-18 14:49:20', '2017-08-26 14:49:22');
+INSERT INTO `goods_category` VALUES ('18961', '豪华大床房', '1', '998.00', '768.00', '758.00', '1', 'http://www.hotel.io/images/1503104670.jpg', 'http://www.hotel.io/images/1503104670.jpg', '标间', '20', '99', '2017-08-18 14:32:44', '2017-08-31 14:33:02');
 
 -- ----------------------------
 -- Table structure for goods_type
@@ -803,36 +814,36 @@ CREATE TABLE `migrations` (
 DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `order_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `order_sn` varchar(20) NOT NULL DEFAULT '',
-  `order_status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0待付款 1已付款 2待发货 3 已发货 4 已签收 5 待评价 6 完成 7 取消',
-  `pay_status` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `order_sn` varchar(64) NOT NULL DEFAULT '',
+  `order_status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0待审核 1预定成功 2已完成',
+  `pay_status` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0 未付款 1 已付款 2已退款',
+  `openid` varchar(64) DEFAULT NULL,
   `uid` int(11) NOT NULL DEFAULT '0',
-  `channel_id` int(10) NOT NULL DEFAULT '0',
-  `uname` varchar(100) NOT NULL,
-  `mobile` varchar(20) DEFAULT NULL,
-  `store_id` tinyint(1) NOT NULL DEFAULT '0',
-  `store_name` varchar(100) NOT NULL DEFAULT '',
   `goods_id` int(11) NOT NULL DEFAULT '0',
   `goods_name` varchar(120) NOT NULL DEFAULT '',
-  `goods_amount` smallint(6) NOT NULL DEFAULT '0',
-  `pay_fee` decimal(10,2) NOT NULL DEFAULT '0.00',
-  `money_paid` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `goods_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '实际单价',
   `bonus` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '积分',
   `order_amount` decimal(10,2) NOT NULL DEFAULT '0.00',
   `add_time` datetime NOT NULL,
-  `confirm_time` int(10) unsigned NOT NULL DEFAULT '0',
-  `pay_time` int(10) unsigned NOT NULL DEFAULT '0',
-  `receive_time` int(10) unsigned NOT NULL DEFAULT '0',
-  `affiliate` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '是否订单已经返佣(2:已返,1:未返)',
-  `froms` char(10) NOT NULL DEFAULT 'mobile' COMMENT 'pc:电脑,mobile:手机,app:应用',
-  `note` varchar(255) DEFAULT NULL,
+  `forms` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1 线上预定 0 线下预定',
+  `pdt_snapshot` varchar(2000) DEFAULT NULL COMMENT '交易快照',
+  `start` varchar(255) DEFAULT NULL,
+  `end` varchar(255) DEFAULT NULL,
+  `last` tinyint(1) DEFAULT '1',
+  `category_id` int(10) DEFAULT NULL,
+  `category_name` varchar(64) DEFAULT NULL,
+  `phone` char(11) DEFAULT NULL,
+  `username` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   UNIQUE KEY `order_sn` (`order_sn`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of orders
 -- ----------------------------
+INSERT INTO `orders` VALUES ('8', '201708191522443393', '2', '1', 'oG3Ulv_z-uJsb-uUmy6m62J5qxc0', '1', '0', '', '0.00', '0.00', '768.00', '2017-08-19 15:22:44', '1', null, '2017-8-19', '2017-8-20', '1', '18961', '豪华大床房', '15639288529', '任磊');
+INSERT INTO `orders` VALUES ('9', '201708191526116493', '2', '1', 'oG3Ulv_z-uJsb-uUmy6m62J5qxc0', '1', '0', '', '0.00', '0.00', '768.00', '2017-08-19 15:26:11', '1', null, '2017-8-19', '2017-8-20', '1', '18961', '豪华大床房', '15639288529', '任磊');
+INSERT INTO `orders` VALUES ('10', '201708191528544888', '0', '1', 'oG3Ulv_z-uJsb-uUmy6m62J5qxc0', '1', '0', '', '258.00', '0.00', '258.00', '2017-08-19 15:28:54', '1', null, '2017-8-19', '2017-8-20', '1', '18973', '标间', '15639288529', '任磊');
 
 -- ----------------------------
 -- Table structure for orders_affiliates
@@ -950,6 +961,49 @@ INSERT INTO `order_goods` VALUES ('1', '64', '1', '测试', '1', '测试电器',
 INSERT INTO `order_goods` VALUES ('2', '64', '2', '侧喝死2 ', '2', '测试电器1', '121651525115121', '0', '1', '300.00', '200.00', '4000.00', '', '12', '21', '2', '3000.00', '21.00');
 
 -- ----------------------------
+-- Table structure for room_status
+-- ----------------------------
+DROP TABLE IF EXISTS `room_status`;
+CREATE TABLE `room_status` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `order_id` int(10) DEFAULT NULL,
+  `name` varchar(64) CHARACTER SET latin1 DEFAULT NULL,
+  `mobile` char(11) CHARACTER SET latin1 DEFAULT NULL,
+  `start_time` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
+  `end_time` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
+  `goods_name` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
+  `category` varchar(32) CHARACTER SET latin1 DEFAULT NULL,
+  `number` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of room_status
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for sms_record
+-- ----------------------------
+DROP TABLE IF EXISTS `sms_record`;
+CREATE TABLE `sms_record` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `mobile` char(11) DEFAULT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+-- ----------------------------
+-- Records of sms_record
+-- ----------------------------
+INSERT INTO `sms_record` VALUES ('1', '15639288529', '665187', '0', '2017-08-19 13:09:43', '2017-08-19 13:09:43');
+INSERT INTO `sms_record` VALUES ('2', '15639288529', '772943', '0', '2017-08-19 13:09:48', '2017-08-19 13:09:48');
+INSERT INTO `sms_record` VALUES ('3', '15639288529', '697242', '0', '2017-08-19 13:06:55', '2017-08-19 13:06:55');
+INSERT INTO `sms_record` VALUES ('4', '15639288529', '833654', '0', '2017-08-19 13:12:10', '2017-08-19 13:12:10');
+
+-- ----------------------------
 -- Table structure for stores
 -- ----------------------------
 DROP TABLE IF EXISTS `stores`;
@@ -996,7 +1050,6 @@ INSERT INTO `stores` VALUES ('2', null, 'travel', '店铺测试', 'http://fenqi.
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `pid` int(11) NOT NULL DEFAULT '0',
   `role` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT 'member' COMMENT 'admin管理员,finance财务,channel渠道员,risk分控员,member消费者',
   `openid` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nickname` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -1005,8 +1058,6 @@ CREATE TABLE `users` (
   `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `sex` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `height` smallint(4) NOT NULL DEFAULT '0',
-  `weight` smallint(4) NOT NULL DEFAULT '0',
   `mobile` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `idcard_no` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `idcard_front` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -1017,14 +1068,10 @@ CREATE TABLE `users` (
   `passport` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '护照',
   `hk_permit` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `taiwan_permit` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `has_car` tinyint(1) NOT NULL DEFAULT '0' COMMENT '有车',
-  `car` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `country` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `province` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `city` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `area` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `residence` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '房产',
-  `household` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '户口',
   `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '现住地址',
   `money` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '充值金额',
   `award` decimal(10,2) DEFAULT NULL COMMENT '分销奖励',
@@ -1032,7 +1079,7 @@ CREATE TABLE `users` (
   `level` tinyint(1) NOT NULL DEFAULT '1' COMMENT '会员级别',
   `vip` tinyint(3) NOT NULL DEFAULT '0' COMMENT '是否开卡',
   `verify` tinyint(1) NOT NULL DEFAULT '0',
-  `status` tinyint(3) DEFAULT '1',
+  `status` tinyint(3) DEFAULT '-1' COMMENT '-1 未认证 0等待通过 1已认证',
   `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1043,9 +1090,9 @@ CREATE TABLE `users` (
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES ('1', '0', 'admin', 'oG3Ulv_z-uJsb-uUmy6m62J5qxc0', 'cj', 'cs', '$2y$10$ElREt5shgOYB1XLyNt/U9entZbiHM2G/E7RO4FJqvcn/i5Mp8T0Qq', 'ceshi', '1', 'http://wx.qlogo.cn/mmopen/YwzJgB9EibSEGyyS0ZSvWNgGkk1ykhAvBttlvia0TicCjjbOwaynXIlZ6LwibJKjDzezVTb3tWpr5BTAVpogAIGz7FcSPaBwHp6b/0', '0', '0', '18691495616', '610231999012345600', 'http://fenqi.emake.cc/images/1499240047.jpg', 'http://fenqi.emake.cc/images/1499240052.jpg', '12333', 'weed@QQ.com', null, null, null, null, '0', null, '中国', '陕西', '西安', null, '', 'http://fenqi.emake.cc/images/1499240146.jpg', '', '0.00', null, '10000', '1', '0', '1', '1', 'EPpeea6QSuREZHni5xPGwXUj3mNmGkFbdn9rxf0OqzkaeY6cxi4ddLA1iAs1', '2017-05-18 02:30:05', '2017-07-11 08:39:29', '2017-07-05 07:42:56');
-INSERT INTO `users` VALUES ('15', '0', 'admin', null, null, '13276888222', '', '管理员', null, null, '0', '0', '13276888222', null, null, null, null, null, null, null, null, null, '0', null, null, null, null, null, null, null, null, '0.00', null, '10000', '1', '0', '0', '1', null, '2017-07-03 06:27:06', '2017-07-03 06:27:06', null);
-INSERT INTO `users` VALUES ('16', '0', 'admin', null, null, '18691495111', '$2y$10$7bQffthmOy/y2je61DZCbeDdT1Mr01tP3u42yfaglLdNFA4qei3Q2', '超级管理员', null, null, '0', '0', '18691495111', null, null, null, null, null, null, null, null, null, '0', null, null, null, null, null, null, null, null, '0.00', null, '10000', '1', '0', '0', '1', 'fcN8yU8oalxgUeVtmEKXSiJdabPNSEKyUhwJnryJV6MLB44Z3jmQdJzVK10r', '2017-07-03 06:29:24', '2017-07-04 08:55:22', null);
+INSERT INTO `users` VALUES ('1', 'admin', 'oG3Ulv_z-uJsb-uUmy6m62J5qxc0', 'cj', 'cs', '$2y$10$ElREt5shgOYB1XLyNt/U9entZbiHM2G/E7RO4FJqvcn/i5Mp8T0Qq', 'xiao wang ', '1', 'http://wx.qlogo.cn/mmopen/YwzJgB9EibSEGyyS0ZSvWNgGkk1ykhAvBttlvia0TicCjjbOwaynXIlZ6LwibJKjDzezVTb3tWpr5BTAVpogAIGz7FcSPaBwHp6b/0', '18691495616', '1441010201267', 'http://www.hotel.io/images/1503060220.jpg', 'http://www.hotel.io/images/1503060226.jpg', '12333', 'weed@QQ.com', null, null, null, null, '中国', '陕西', '西安', null, '', '0.00', null, '10000', '1', '0', '1', '1', 'EPpeea6QSuREZHni5xPGwXUj3mNmGkFbdn9rxf0OqzkaeY6cxi4ddLA1iAs1', '2017-05-18 02:30:05', '2017-08-19 13:13:01', '2017-07-05 07:42:56');
+INSERT INTO `users` VALUES ('15', 'admin', null, null, '13276888222', '', '管理员', null, null, '13276888222', null, null, null, null, null, null, null, null, null, null, null, null, null, null, '0.00', null, '10000', '1', '0', '0', '1', null, '2017-07-03 06:27:06', '2017-07-03 06:27:06', null);
+INSERT INTO `users` VALUES ('16', 'admin', null, null, '18691495111', '$2y$10$7bQffthmOy/y2je61DZCbeDdT1Mr01tP3u42yfaglLdNFA4qei3Q2', '超级管理员', null, null, '18691495111', null, null, null, null, null, null, null, null, null, null, null, null, null, null, '0.00', null, '10000', '1', '0', '0', '1', 'fcN8yU8oalxgUeVtmEKXSiJdabPNSEKyUhwJnryJV6MLB44Z3jmQdJzVK10r', '2017-07-03 06:29:24', '2017-07-04 08:55:22', null);
 
 -- ----------------------------
 -- Table structure for users_address
